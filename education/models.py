@@ -11,9 +11,9 @@ class Course(models.Model):
 
     def __str__(self):
         if self.description:
-            return f'{self.name}: {self.description}'
+            return f'{self.title}: {self.description}'
         else:
-            return f'{self.name}: нет описания'
+            return f'{self.title}: нет описания'
 
     class Meta:
         verbose_name = 'курс'
@@ -25,12 +25,18 @@ class Lesson(models.Model):
     description = models.TextField(verbose_name='описание', **NULLABLE)
     preview = models.ImageField(upload_to='courses/', verbose_name='превью', **NULLABLE)
     url = models.CharField(max_length=100, verbose_name='ссылка')
+    course = models.ForeignKey(
+        'education.Course',
+        on_delete=models.CASCADE,
+        verbose_name='курс',
+        default='0',
+    )
 
     def __str__(self):
         if self.description:
-            return f'{self.name} ({self.url}): {self.description}'
+            return f'{self.title} ({self.url}): {self.description}'
         else:
-            return f'{self.name} ({self.url}): нет описания'
+            return f'{self.title} ({self.url}): нет описания'
 
     class Meta:
         verbose_name = 'урок'
