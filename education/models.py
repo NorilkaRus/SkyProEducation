@@ -29,7 +29,6 @@ class Lesson(models.Model):
         'education.Course',
         on_delete=models.CASCADE,
         verbose_name='курс',
-        default='0',
     )
 
     def __str__(self):
