@@ -15,6 +15,7 @@ requests = "^2.31.0"
 ipython = "^8.20.0"
 pytils = "^0.4.1"
 python-dotenv = "^1.0.0"
+django-filter = "^23.5"
 
 
 [build-system]
