@@ -1,5 +1,6 @@
 from django.db import models
 from rest_framework import serializers
+from config import settings
 
 # Create your models here.
 NULLABLE = {'blank':  True, 'null': True}
@@ -8,6 +9,7 @@ class Course(models.Model):
     title = models.CharField(max_length=100, verbose_name='название')
     description = models.TextField(verbose_name='описание', **NULLABLE)
     preview = models.ImageField(upload_to='courses/', verbose_name='превью', **NULLABLE)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='владелец', **NULLABLE)
 
     def __str__(self):
         if self.description:
@@ -25,6 +27,7 @@ class Lesson(models.Model):
     description = models.TextField(verbose_name='описание', **NULLABLE)
     preview = models.ImageField(upload_to='courses/', verbose_name='превью', **NULLABLE)
     url = models.CharField(max_length=100, verbose_name='ссылка')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='владелец', **NULLABLE)
     course = models.ForeignKey(
         'education.Course',
         on_delete=models.CASCADE,

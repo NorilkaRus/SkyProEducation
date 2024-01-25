@@ -2,6 +2,9 @@ from django.urls import path
 from education.apps import EducationConfig
 from rest_framework.routers import DefaultRouter
 from education.views import *
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView, )
 
 app_name = EducationConfig.name
 router = DefaultRouter()
@@ -13,4 +16,6 @@ urlpatterns = [
                   path('lessons/<int:pk>/update/', LessonUpdateAPIView.as_view(), name='lesson-update'),
                   path('lessons/<int:pk>/delete/', LessonDeleteAPIView.as_view(), name='lesson-delete'),
                   path('lessons/list/', LessonListAPIView.as_view(), name='lessons-list'),
+                  path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+                  path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
               ] + router.urls

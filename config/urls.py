@@ -19,7 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 
 urlpatterns = [
-    #path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('education/', include('education.urls', namespace='education')),
     path('users/', include('users.urls', namespace='users')),
 ]
