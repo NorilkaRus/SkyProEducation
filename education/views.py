@@ -4,12 +4,16 @@ from education.models import *
 from education.serializers import *
 from education.permissions import IsOwner, IsModerator
 from rest_framework.permissions import IsAuthenticated
+from django.http import HttpResponse
+from django.template import loader
+from education.paginators import LessonsPaginator
 
 
 # Create your views here.
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
+    pagination_class = LessonsPaginator
     def get_permissions(self):
         if self.action == 'create':
             permission_classes = [IsAuthenticated]
@@ -55,3 +59,27 @@ class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
     permission_classes = [IsOwner | IsModerator]
+    pagination_class = LessonsPaginator
+
+def index(request):
+    template = loader.get_template('education/index.html')
+    objects = Course.objects.all()
+    context = {'objects': objects}
+    return HttpResponse(template.render(context, request))
+
+
+class SubscriptionCreateAPIView(generics.CreateAPIView):
+    serializer_class = SubscriptionSerializer
+    queryset = Subscription.objects.all()
+    permission_classes = [IsAuthenticated]
+
+
+class SubscriptionUpdateView(generics.UpdateAPIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+    permission_classes = [IsOwner]
+
+
+class SubscriptionDestroyAPIView(generics.DestroyAPIView):
+    queryset = Subscription.objects.all()
+    permission_classes = [IsOwner]
