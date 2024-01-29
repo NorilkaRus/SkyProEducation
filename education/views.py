@@ -7,6 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.http import HttpResponse
 from django.template import loader
 from education.paginators import LessonsPaginator
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 
 # Create your views here.
@@ -24,6 +26,18 @@ class CourseViewSet(viewsets.ModelViewSet):
         elif self.action == 'destroy':
             permission_classes = [IsAuthenticated, IsOwner]
         return [permission() for permission in permission_classes]
+
+    @action(detail=True, methods=['post'])
+    def subscribe(self, request, pk: int):
+        course = get_object_or_404(Course, pk=pk)
+        Subscription.objects.create(course=course, user=request.user)
+        return Response(status=201)
+
+    @action(detail=True, methods=['post'])
+    def unsubscribe(self, request, pk: int):
+        course = get_object_or_404(Course, pk=pk)
+        Subscription.objects.filter(course=course, user=request.user).delete()
+        return Response(status=204)
 
 
 
@@ -68,18 +82,12 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
-class SubscriptionCreateAPIView(generics.CreateAPIView):
-    serializer_class = SubscriptionSerializer
-    queryset = Subscription.objects.all()
-    permission_classes = [IsAuthenticated]
-
-
-class SubscriptionUpdateView(generics.UpdateAPIView):
-    queryset = Subscription.objects.all()
-    serializer_class = SubscriptionSerializer
-    permission_classes = [IsOwner]
-
-
-class SubscriptionDestroyAPIView(generics.DestroyAPIView):
-    queryset = Subscription.objects.all()
-    permission_classes = [IsOwner]
+# class SubscriptionCreateAPIView(generics.CreateAPIView):
+#     serializer_class = SubscriptionSerializer
+#     queryset = Subscription.objects.all()
+#     permission_classes = [IsAuthenticated]
+#
+#
+# class SubscriptionDestroyAPIView(generics.DestroyAPIView):
+#     queryset = Subscription.objects.all()
+#     permission_classes = [IsOwner]

@@ -22,8 +22,7 @@ urlpatterns = [
                   path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
                   path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-                  path('courses/create_sub/', SubscriptionCreateAPIView.as_view(), name='subscription_create'),
-                  path('courses/update_sub/<int:pk>/', SubscriptionUpdateView.as_view(), name='subscription_update'),
-                  path('courses/delete_sub/<int:pk>/', SubscriptionDestroyAPIView.as_view(), name='subscription_delete'),
+                  path('courses/<int:pk>/subscribe/', SubscriptionCreateAPIView.as_view(), name='subscription_create'),
+                  path('courses/<int:pk>/unsubscribe/', SubscriptionDestroyAPIView.as_view(), name='subscription_delete'),
 
               ] + router.urls
