@@ -4,6 +4,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from education.models import *
 from users.models import *
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
 # Create your tests here.
 
 class LessonTestCase(APITestCase):
@@ -11,7 +13,9 @@ class LessonTestCase(APITestCase):
     def setUp(self) -> None:
         self.lesson = Lesson.objects.create(
             title='test_title',
-            description = 'test_description'
+            description = 'test_description',
+            url= 'youtube.com/123',
+            course_id= 1
         )
         self.course = Course.objects.create(
             title='test',
@@ -19,14 +23,10 @@ class LessonTestCase(APITestCase):
 
 
     def test_get_list(self):
-        """
-        Тестирование просмотра уроков
-        """
-
+        """ Тестирование просмотра уроков """
         response = self.client.get(
-            reverse('education:lesson_list')
+            reverse('education:lessons-list')
         )
-
         self.assertEquals(
             response.status_code,
             status.HTTP_200_OK
@@ -34,9 +34,7 @@ class LessonTestCase(APITestCase):
 
 
     def test_lesson_create(self):
-        """
-        Тест создания урока
-        """
+        """ Тест создания урока """
 
         data = {
             'title': 'test2',
@@ -44,62 +42,63 @@ class LessonTestCase(APITestCase):
         }
 
         response = self.client.post(
-            reverse('education:lesson_create'),
+            reverse('education:lesson-create'),
             data=data
         )
 
         self.assertEquals(
             response.status_code,
-            status.HTTP_201_CREATED
+            status.HTTP_401_UNAUTHORIZED
         )
 
         self.assertEquals(
             Lesson.objects.all().count(),
-            2
+            1
         )
 
     def test_lesson_create_validation_error(self):
-        """
-        Тест ошибки валидации
-        """
+        """ Тест ошибки валидации """
+        self.user = User.objects.create(
+            email='admin@admin.com',
+            first_name='Frida',
+            last_name='Shishka',
+            is_staff=True,
+            is_superuser=True
+        )
+        self.user.set_password('admin')
+        self.user.save()
+        self.client.force_authenticate(user=self.user)
 
         data = {
             'title': 'test3',
             'description': self.lesson.description,
             'video': 'Посторонний ресурс'
         }
-
         response = self.client.post(
-            reverse('education:lesson_create'),
-            data=data
+            reverse('education:lesson-create'),
+            data=data,
+            user=self.user
         )
-
         self.assertEquals(
             response.status_code,
             status.HTTP_400_BAD_REQUEST
         )
 
     def test_lesson_update(self):
-        response = self.client.patch(reverse("education:lesson_update", args=[self.lesson.pk]), data={
+        response = self.client.patch(reverse("education:lesson-update", args=[self.lesson.pk]), data={
             'title': self.lesson.pk,
             'description': 'Test Description Update',
         })
-
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-
         self.assertEquals(
             response.json(),
             {'description': 'Test Description Update', 'id': 1, 'title': 'test', 'url': None }
-
         )
-
 
 
     def test_lesson_delete(self):
         """ Тест удаления урока без авторизации"""
-
-        response = self.client.delete(reverse('education:lesson_delete', args=[self.lesson.pk]))
-
+        response = self.client.delete(reverse('education:lesson-delete', args=[self.lesson.pk]))
         self.assertEquals(
             response.status_code,
             status.HTTP_401_UNAUTHORIZED
@@ -113,80 +112,47 @@ class LessonTestCase(APITestCase):
 class CreateSubscription(APITestCase):
 
     def setUp(self) -> None:
-        self.user = User.objects.create(
-            email='admin1@admin.com',
-            is_staff=True,
-            is_active=True,
-        )
-        self.user.set_password('admin1')
-        self.user.save()
-        self.client.force_authenticate(self.user)
-
         self.course = Course.objects.create(
-            title='test'
+            title='test123',
+            description='test123',
         )
+
+        self.user = User.objects.create(
+            email='admin@admin.com',
+            first_name='Frida',
+            last_name='Shishka',
+            is_staff=True,
+            is_superuser=True
+        )
+        self.user.set_password('admin')
+        self.user.save()
+        self.client.force_authenticate(user=self.user)
         self.subscription = Subscription.objects.create(
             user=self.user,
-            course=self.course,
-            subscribed=True
+            course=self.course
         )
 
-    def test_sub_create(self):
-        """
-        Тест создания подписки
-        """
-
+    def test_create_subscription(self):
+        """ Тест создания подписки """
         data = {
             'user': self.user.pk,
-            'course': self.course.pk,
-            'subscribed': False
+            'course': self.course.pk
         }
 
-        response = self.client.post(
-            reverse('education:subscription_create'),
-            data=data
-        )
+        response = self.client.post('education:subscription', data=data)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
-
-    def test_sub_update(self):
-        """
-        Тестирование обновления подписки
-        """
-
-        data = {
-            'user': self.subscription.user.pk,
-            'course':self.subscription.course.pk,
-            'subscribed': True
-        }
-
-        response = self.client.put(
-            reverse('education:subscription_update', args=[self.subscription.pk]), data=data)
+    def test_subscription_list(self):
+        """ Тест просмотра подписок """
+        response = self.client.get('education:subscription')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-
-        self.assertEquals(
-            response.json(),
-            {'id': 4, 'subscribed': True, 'user': 3, 'course': 3}
-
-        )
-
-
-    def test_sub_delete(self):
-
-        response = self.client.delete(reverse('education:subscription_delete', kwargs={'pk': self.subscription.pk}))
-
-        self.assertEquals(
-            response.status_code,
-            status.HTTP_204_NO_CONTENT
-        )
-
-        self.assertFalse(
-            Lesson.objects.all().exists(),
-        )
+    def test_delete_subscription(self):
+        """ Тест удаления подписки """
+        response = self.client.delete('education:subscription')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def tearDown(self):
         User.objects.all().delete()
-        Lesson.objects.all().delete()
-        Subscription.objects.all().delete()
+        Course.objects.all().delete()

@@ -3,7 +3,7 @@ from rest_framework import viewsets, generics
 from education.models import *
 from education.serializers import *
 from education.permissions import IsOwner, IsModerator
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.http import HttpResponse
 from django.template import loader
 from education.paginators import LessonsPaginator
@@ -82,12 +82,12 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
-# class SubscriptionCreateAPIView(generics.CreateAPIView):
-#     serializer_class = SubscriptionSerializer
-#     queryset = Subscription.objects.all()
-#     permission_classes = [IsAuthenticated]
-#
-#
-# class SubscriptionDestroyAPIView(generics.DestroyAPIView):
-#     queryset = Subscription.objects.all()
-#     permission_classes = [IsOwner]
+class SubscriptionViewSet(viewsets.ModelViewSet):
+    serializer_class = SubscriptionSerializer
+    queryset = Subscription.objects.all()
+    permission_classes = [AllowAny]
+
+    def perform_create(self, serializer):
+        new_lesson = serializer.save()
+        new_lesson.user = self.request.user
+        new_lesson.save()

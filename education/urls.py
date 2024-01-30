@@ -5,10 +5,12 @@ from education.views import *
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView, )
+from django.urls import path, include
 
 app_name = EducationConfig.name
 router = DefaultRouter()
 router.register(r'courses', CourseViewSet, basename='courses')
+router.register(r'subscription', SubscriptionViewSet, basename='subscription')
 
 urlpatterns = [
                   path('lessons/create/', LessonCreateAPIView.as_view(), name='lesson-create'),
@@ -22,7 +24,8 @@ urlpatterns = [
                   path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
                   path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-                  path('courses/<int:pk>/subscribe/', SubscriptionCreateAPIView.as_view(), name='subscription_create'),
-                  path('courses/<int:pk>/unsubscribe/', SubscriptionDestroyAPIView.as_view(), name='subscription_delete'),
+                  # path('courses/<int:pk>/subscribe/', SubscriptionCreateAPIView.as_view(), name='subscription_create'),
+                  # path('courses/<int:pk>/unsubscribe/', SubscriptionDestroyAPIView.as_view(), name='subscription_delete'),
+                  path('lesson/subscribe/', include(router.urls)),
 
               ] + router.urls
