@@ -4,9 +4,7 @@ from users.models import UserRoles
 class IsModerator(BasePermission):
     message = 'Вы не являетесь владельцем'
     def has_permission(self, request, view):
-        if request.user.role == UserRoles.MODERATOR:
-            return True
-        return False
+        return request.user.is_staff
 
 
 class IsOwner(BasePermission):

@@ -81,13 +81,3 @@ def index(request):
     context = {'objects': objects}
     return HttpResponse(template.render(context, request))
 
-
-class SubscriptionViewSet(viewsets.ModelViewSet):
-    serializer_class = SubscriptionSerializer
-    queryset = Subscription.objects.all()
-    permission_classes = [AllowAny]
-
-    def perform_create(self, serializer):
-        new_lesson = serializer.save()
-        new_lesson.user = self.request.user
-        new_lesson.save()

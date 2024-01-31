@@ -17,6 +17,7 @@ pytils = "^0.4.1"
 python-dotenv = "^1.0.0"
 django-filter = "^23.5"
 djangorestframework-simplejwt = "^5.3.1"
+coverage = "^7.4.1"
 
 
 [build-system]

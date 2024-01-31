@@ -7,5 +7,6 @@ class YouTubeValidator:
 
     def __call__(self, value):
         url = value.get(self.field)
-        if 'youtube.com' not in url:
-            raise ValidationError('Недопустимая ссылка на сторонний ресурс')
+        if url:
+            if 'youtube.com' not in url:
+                raise ValidationError('Недопустимая ссылка на сторонний ресурс')
