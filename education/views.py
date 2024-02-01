@@ -9,7 +9,7 @@ from django.template import loader
 from education.paginators import LessonsPaginator
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 class CourseViewSet(viewsets.ModelViewSet):
@@ -19,13 +19,16 @@ class CourseViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == 'create':
             permission_classes = [IsAuthenticated]
-        elif self.action == 'list' or self.action == 'retrieve':
+        elif self.action in ['list', 'retrieve', 'update']:
             permission_classes = [IsAuthenticated, IsOwner | IsModerator]
         elif self.action == 'update':
             permission_classes = [IsAuthenticated, IsOwner | IsModerator]
         elif self.action == 'destroy':
             permission_classes = [IsAuthenticated, IsOwner]
+        else:
+            permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
+
 
     @action(detail=True, methods=['post'])
     def subscribe(self, request, pk: int):
