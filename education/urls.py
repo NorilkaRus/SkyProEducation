@@ -2,6 +2,7 @@ from django.urls import path
 from education.apps import EducationConfig
 from rest_framework.routers import DefaultRouter
 from education.views import *
+from payments.views import *
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView, )
@@ -25,6 +26,9 @@ urlpatterns = [
 
                   # path('courses/<int:pk>/subscribe/', SubscriptionCreateAPIView.as_view(), name='subscription_create'),
                   # path('courses/<int:pk>/unsubscribe/', SubscriptionDestroyAPIView.as_view(), name='subscription_delete'),
-                  path('lesson/subscribe/', include(router.urls), name='lesson-subscribe'),
+                  path('lessons/subscribe/', include(router.urls), name='lesson-subscribe'),
+
+                  path('payments/pay/', PaymentCreateAPIView.as_view(), name='payment-create'),
+                  path('payments/retrieve/', PaymentRetrieveAPIView.as_view(), name='payment-detail'),
 
               ] + router.urls
