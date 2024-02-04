@@ -31,4 +31,6 @@ urlpatterns = [
                   path('payments/pay/', PaymentCreateAPIView.as_view(), name='payment-create'),
                   path('payments/retrieve/', PaymentRetrieveAPIView.as_view(), name='payment-detail'),
 
+                  path('courses/<int:pk>/update/', CourseUpdateAPIview.as_view(), name='course-update'),
+
               ] + router.urls

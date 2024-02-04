@@ -4,7 +4,8 @@ from config import settings
 from users.models import User
 
 # Create your models here.
-NULLABLE = {'blank':  True, 'null': True}
+NULLABLE = {'blank': True, 'null': True}
+
 
 class Course(models.Model):
     title = models.CharField(max_length=100, verbose_name='название')
@@ -26,6 +27,7 @@ class Course(models.Model):
 class Lesson(models.Model):
     title = models.CharField(max_length=100, verbose_name='название')
     description = models.TextField(verbose_name='описание', **NULLABLE)
+    update = models.TextField(verbose_name="обновление", default="Новые материалы курса")
     preview = models.ImageField(upload_to='courses/', verbose_name='превью', **NULLABLE)
     url = models.CharField(max_length=100, verbose_name='ссылка')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='владелец', **NULLABLE)

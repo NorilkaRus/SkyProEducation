@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404
 import stripe
 from stripe import InvalidRequestError
 from django.http import request
-
+from education.tasks import update_course
 
 # Create your views here.
 class CourseViewSet(viewsets.ModelViewSet):
@@ -88,4 +88,13 @@ def index(request):
     objects = Course.objects.all()
     context = {'objects': objects}
     return HttpResponse(template.render(context, request))
+
+
+class CourseUpdateAPIview(generics.UpdateAPIView):
+    serializer_class = CourseSerializer
+    queryset = Course.objects.all()
+
+    def perform_update(self, serializer):
+        description = serializer.save()
+        update_course.delay()
 
