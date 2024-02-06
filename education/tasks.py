@@ -14,7 +14,7 @@ def update_course():
     """Рассылка обновления курса"""
     my_mail = ["norilkarus@gmail.com"]
     for item in Course.objects.all():
-        if item.description != item.update:
+        if item.update == True:
             print(f'Обновление курса')
             send_mail(
                 subject='Курс был обновлен',
@@ -23,7 +23,6 @@ def update_course():
                 recipient_list=[my_mail]
 
             )
-            item.description = item.update
             item.save()
 
 
