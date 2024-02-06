@@ -23,6 +23,7 @@ def update_course():
                 recipient_list=[my_mail]
 
             )
+            item.update = False
             item.save()
 
 
