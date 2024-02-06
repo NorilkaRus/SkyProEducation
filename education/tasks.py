@@ -13,16 +13,19 @@ from users.models import User
 def update_course():
     """Рассылка обновления курса"""
     my_mail = ["norilkarus@gmail.com"]
-    for item in Course.objects.all():
+    for item in Lesson.objects.filter(update=True):
+
         if item.update == True:
             print(f'Обновление курса')
-            send_mail(
-                subject='Курс был обновлен',
-                message='В кусре произошли обновления',
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[my_mail]
+            for i in lesson.course.subscriptions.all():
+                send_mail(
+                    subject='Курс был обновлен',
+                    message='В кусре произошли обновления',
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[my_mail]
 
-            )
+                )
+
             item.update = False
             item.save()
 
