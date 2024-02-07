@@ -22,7 +22,7 @@ def update_course():
                     subject='Курс был обновлен',
                     message='В кусре произошли обновления',
                     from_email=settings.EMAIL_HOST_USER,
-                    recipient_list=[my_mail]
+                    recipient_list=[i.user.email]
 
                 )
 
